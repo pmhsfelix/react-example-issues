@@ -1,0 +1,21 @@
+import React from 'react'
+
+export default ({result, onJson, onLoading, onError}) => {
+  if (result.loading) {
+    if (onLoading) {
+      return onLoading(result)
+    } else {
+      return <div> loading ... </div>
+    }
+  } else if (result.error) {
+    if (onError) {
+      return onError(result)
+    } else {
+      return <div> ERROR! </div>
+    }
+  } else if (result.json) {
+    return onJson(result.json)
+  } else {
+    return <div> Oops, invalid state </div>
+  }
+}
