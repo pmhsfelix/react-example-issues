@@ -1,5 +1,6 @@
 import React from 'react'
 import fetch from 'isomorphic-fetch'
+import {makeCancellable} from './promises'
 
 export default class extends React.Component {
   constructor (props) {
@@ -36,6 +37,12 @@ export default class extends React.Component {
     if (this.state.loading) this.load(this.state.url)
   }
 
+  componentWillUnmount () {
+    if (this.promise) {
+      this.promise.cancel()
+    }
+  }
+
   setQuery (query) {
     console.log(`setQuery(${query})`)
     this.setState({
@@ -53,19 +60,28 @@ export default class extends React.Component {
 
   load (url) {
     console.log(`load(${url})`)
-    return fetch(url)
+    if (this.promise) {
+      this.promise.cancel()
+    }
+    this.promise = makeCancellable(fetch(url))
       .then(resp => {
         if (resp.status >= 400) {
-          throw new Error(resp)
+          throw new Error('Unable to access content')
         }
-        return resp.json().then(json => {
-          this.setState({
-            loading: false,
-            json: json,
-            response: resp,
-            error: undefined
-          })
+        const ct = resp.headers.get('content-type') || ''
+        if (ct === 'application/json' || ct.startsWith('application/json;')) {
+          return resp.json().then(json => [resp, json])
+        }
+        throw new Error(`unexpected content type ${ct}`)
+      })
+      .then(([resp, json]) => {
+        this.setState({
+          loading: false,
+          json: json,
+          response: resp,
+          error: undefined
         })
+        this.promise = undefined
       })
       .catch(error => {
         this.setState({
@@ -74,6 +90,7 @@ export default class extends React.Component {
           json: undefined,
           response: undefined
         })
+        this.promise = undefined
       })
   }
 }

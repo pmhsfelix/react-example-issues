@@ -2,6 +2,7 @@ import React from 'react'
 import fetch from 'isomorphic-fetch'
 import HttpGet from './http-get'
 import HttpGetSwitch from './http-get-switch'
+import {makeCancellable} from './promises'
 
 const EditModes = {
   edit: 'edit',
@@ -39,8 +40,17 @@ class Edit extends React.Component {
     this.save()
   }
 
+  componentWillUnmount () {
+    if (this.promise) {
+      this.promise.cancel()
+    }
+  }
+
   save () {
-    fetch(this.props.issue.url,
+    if (this.promise) {
+      this.promise.cancel()
+    }
+    this.promise = makeCancellable(fetch(this.props.issue.url,
       {
         method: 'PATCH',
         headers: {
@@ -49,18 +59,20 @@ class Edit extends React.Component {
         },
         // credentials: 'include',
         body: JSON.stringify({body: this.state.body})
-      })
+      }))
       .then(resp => {
         this.setState({
           mode: EditModes.edit,
           response: resp
         })
+        this.promise = undefined
       })
       .catch(error => {
         this.setState({
           mode: Edit.edit,
           error: error
         })
+        this.promise = undefined
       })
   }
 

@@ -11,7 +11,7 @@ export default ({result, onJson, onLoading, onError}) => {
     if (onError) {
       return onError(result)
     } else {
-      return <div> ERROR! </div>
+      return <div> ERROR: {result.error.message}</div>
     }
   } else if (result.json) {
     return onJson(result.json)
