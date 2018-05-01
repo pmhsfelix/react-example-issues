@@ -8,18 +8,27 @@ function issuesUrl (repo) {
   return new URITemplate(repo.issues_url).expand({})
 }
 
-export default ({url, onSelectIssues}) => (
+function pullsUrl (repo) {
+  return new URITemplate(repo.pulls_url).expand({})
+}
+
+export default ({url, onSelectIssues, onSelectPullRequests}) => (
   <div>
     <HttpGet url={url}
       render={(result) => (
         <div>
           <Paginator response={result.response} onChange={url => result.setUrl(url)} />
           <HttpGetSwitch result={result}
+            onLoading={() => <div>loading repos</div>}
             onJson={json => (
               <ul>
                 {json.map(repo => <li key={repo.id}>
+                  <span>{repo.name}</span>
                   <button onClick={ev => onSelectIssues(issuesUrl(repo))} >
-                    {`${repo.name}`}
+                    issues
+                  </button>
+                  <button onClick={ev => onSelectPullRequests(pullsUrl(repo))} >
+                    pull requests
                   </button>
                 </li>)}
               </ul>
