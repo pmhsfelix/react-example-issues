@@ -1,9 +1,14 @@
 var path = require('path')
 
+console.log("DIR" + __dirname)
+
 module.exports = {
-  entry: './js/index.js',
+  entry: {
+    main: './js/index.js',
+    redirect: './js/redirect.js'
+  },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist')
   },
   module: {

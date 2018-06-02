@@ -10,6 +10,7 @@ import IssueEdit from './issue-edit'
 import PullsList from './pulls-list'
 import Delay from './delay'
 import Header from './header'
+import Login, {Redirect as LoginRedirect} from './login'
 
 const issuesTempl = new URITemplate('/issues/{url}')
 const pullsTempl = new URITemplate('/pulls/{url}')
@@ -26,7 +27,10 @@ export default class extends React.Component {
       <BrowserRouter>
         <div>
           <Header />
+          <hr />
           <Switch>
+            <Route path='/login' component={Login} />
+            <Route path='/redirect2' component={LoginRedirect} />
             <Route path='/pulls/:url' render={({match, history}) => (
               <PullsList
                 url={URI.decode(match.params.url)}
@@ -35,7 +39,7 @@ export default class extends React.Component {
             <Route path='/repos/:url' render={({match, history}) => (
               <RepoList
                 url={URI.decode(match.params.url)}
-                onSelectIssues={url => history.push(issuesTempl.expand({url}))} 
+                onSelectIssues={url => history.push(issuesTempl.expand({url}))}
                 onSelectPullRequests={url => history.push(pullsTempl.expand({url}))} />
             )} />
             <Route exact path='/issues/:url' render={({match, history}) => (

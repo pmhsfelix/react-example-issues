@@ -63,7 +63,8 @@ export default class extends React.Component {
     if (this.promise) {
       this.promise.cancel()
     }
-    this.promise = makeCancellable(fetch(url))
+    this.promise = makeCancellable(fetch(url, {
+    }))
       .then(resp => {
         if (resp.status >= 400) {
           throw new Error('Unable to access content')

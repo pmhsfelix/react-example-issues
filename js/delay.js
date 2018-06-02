@@ -5,7 +5,7 @@ import HttpGetSwitch from './http-get-switch'
 export default () => (
   <div>
     <HttpGet
-      url='http://httpbin.org/delay/5'
+      url='https://httpbin.org/delay/3'
       render={(result) => (
         <div>
           <HttpGetSwitch result={result}
